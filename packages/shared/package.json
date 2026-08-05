@@ -1,5 +1,5 @@
 {
-  "name": "@solarapp/shared",
+  "name": "@kikos/shared",
   "version": "1.0.0",
   "private": true,
   "main": "dist/index.js",
@@ -10,8 +10,8 @@
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
-    "@solarapp/eslint-config": "workspace:*",
-    "@solarapp/typescript-config": "workspace:*",
+    "@kikos/eslint-config": "workspace:*",
+    "@kikos/typescript-config": "workspace:*",
     "@types/node": "^24.1.0",
     "eslint": "^9.32.0",
     "typescript": "5.8.3"

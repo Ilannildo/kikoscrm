@@ -1,9 +1,9 @@
 {
-  "extends": "@solarapp/typescript-config/react-library.json",
+  "extends": "@kikos/typescript-config/react-library.json",
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@solarapp/ui/*": ["./src/*"]
+      "@kikos/ui/*": ["./src/*"]
     }
   },
   "include": ["src"],

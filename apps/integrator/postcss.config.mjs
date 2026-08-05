@@ -1,1 +1,0 @@
-export { default } from "@solarapp/ui/postcss.config";

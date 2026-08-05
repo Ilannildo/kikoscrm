@@ -1,5 +1,5 @@
 {
-  "name": "@solarapp/db",
+  "name": "@kikos/db",
   "version": "1.0.0",
   "private": true,
   "main": "dist/index.js",
@@ -12,8 +12,8 @@
   },
   "devDependencies": {
     "prisma": "^6.12.0",
-    "@solarapp/eslint-config": "workspace:*",
-    "@solarapp/typescript-config": "workspace:*",
+    "@kikos/eslint-config": "workspace:*",
+    "@kikos/typescript-config": "workspace:*",
     "@types/node": "^24.1.0",
     "eslint": "^9.32.0",
     "typescript": "5.8.3"

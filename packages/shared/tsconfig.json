@@ -1,5 +1,5 @@
 {
-  "extends": "@solarapp/typescript-config/node.json",
+  "extends": "@kikos/typescript-config/node.json",
   "compilerOptions": {
     "lib": [
       "ES2022"

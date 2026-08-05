@@ -1,5 +1,5 @@
 {
-  "name": "@solarapp/eslint-config",
+  "name": "@kikos/eslint-config",
   "version": "0.0.0",
   "type": "module",
   "private": true,

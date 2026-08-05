@@ -1,5 +1,5 @@
 {
-  "name": "@solarapp/ui",
+  "name": "@kikos/ui",
   "version": "0.0.0",
   "private": true,
   "exports": {
@@ -17,8 +17,8 @@
     "check-types": "tsc --noEmit"
   },
   "devDependencies": {
-    "@solarapp/eslint-config": "workspace:*",
-    "@solarapp/typescript-config": "workspace:*",
+    "@kikos/eslint-config": "workspace:*",
+    "@kikos/typescript-config": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@turbo/gen": "^2.5.5",
     "@types/node": "^24.1.0",

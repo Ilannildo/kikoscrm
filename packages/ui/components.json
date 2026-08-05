@@ -12,11 +12,11 @@
 
   },
   "aliases": {
-    "components": "@solarapp/ui/components",
-    "ui": "@solarapp/ui/components/base",
-    "utils": "@solarapp/ui/lib/utils",
-    "lib": "@solarapp/ui/lib",
-    "hooks": "@solarapp/ui/hooks"
+    "components": "@kikos/ui/components",
+    "ui": "@kikos/ui/components/base",
+    "utils": "@kikos/ui/lib/utils",
+    "lib": "@kikos/ui/lib",
+    "hooks": "@kikos/ui/hooks"
   },
   "iconLibrary": "lucide"
 }

@@ -14,3 +14,4 @@ onlyBuiltDependencies:
   - nestjs-pino
   - prisma
   - sharp
+  - unrs-resolver

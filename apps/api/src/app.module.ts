@@ -1,14 +1,11 @@
-import { JsonBodyMiddleware } from '@common/middlewares/json-body.middleware';
-import { SecurityMiddleware } from '@common/middlewares/security.middleware';
-import { ZodValidationPipe } from '@common/pipes/zod-validation.pipe';
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { ZodSerializerInterceptor } from 'nestjs-zod';
+import { AuthGuard, AuthModule } from '@thallesp/nestjs-better-auth';
+import { ZodSerializerInterceptor, ZodValidationPipe } from 'nestjs-zod';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { InfraModule } from './infra/infra.module';
-import { BullModule } from '@nestjs/bullmq';
-import { env } from './env';
+import { auth } from './lib/auth';
 
 @Module({
   imports: [
@@ -19,15 +16,18 @@ import { env } from './env';
         limit: 100,
       },
     ]),
-    BullModule.forRoot({
-      connection: {
-        url: env.REDIS_URL,
-      },
+    AuthModule.forRoot({
+      auth,
+      disableBodyParser: true,
     }),
     InfraModule,
   ],
   controllers: [],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
     {
       provide: APP_PIPE,
       useClass: ZodValidationPipe,
@@ -46,8 +46,4 @@ import { env } from './env';
     },
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(SecurityMiddleware, JsonBodyMiddleware).forRoutes('*');
-  }
-}
+export class AppModule { }

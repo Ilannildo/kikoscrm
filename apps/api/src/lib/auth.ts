@@ -6,6 +6,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { createAuthMiddleware } from 'better-auth/api';
 import { env } from '@/env';
 import { PrismaClient } from '../../prisma/generated/client';
+import { openAPI } from "better-auth/plugins"
 
 const adapter = new PrismaPg({ connectionString: env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
@@ -55,7 +56,8 @@ export const auth = betterAuth({
 		},
 	},
 	trustedOrigins: CORS_ALLOWED_ORIGINS,
-	appName: 'Kikos',
+	appName: 'Kikos',	
+	plugins: [openAPI()]
 });
 
 export function formatAuthError(error: APIError, path?: string) {
@@ -85,5 +87,4 @@ const AUTH_ERROR_TRANSLATE: Partial<Record<AuthErrorCode, string>> = {
 	INVALID_EMAIL_OR_PASSWORD: 'Verifique suas credenciais e tente novamente.',
 	USER_NOT_FOUND: 'Usuário não encontrado',
 	ACCOUNT_NOT_FOUND: 'Conta não encontrada',
-	//...other custom errors
 } as const;

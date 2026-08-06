@@ -9,6 +9,7 @@ import { Codes } from '@kikos/shared';
 import { Response } from 'express';
 import { IncomingMessage } from 'http';
 import { ZodSerializationException } from 'nestjs-zod';
+import { ZodError } from 'zod';
 
 export interface HttpExceptionResponse {
   statusCode: number;
@@ -44,9 +45,11 @@ export const getErrorMessage = (exception: unknown): any => {
 
   if (exception instanceof ZodSerializationException) {
     const zodError = exception.getZodError();
-    const error = zodError.errors.length > 0 ? zodError.errors[0] : undefined;
+    if (zodError instanceof ZodError) {
 
-    return error.message || 'Erro de validação';
+      const error = zodError.issues.length > 0 ? zodError.issues[0] : undefined;
+      return error?.message || 'Erro de validação';
+    }
   }
 
   return String(exception);

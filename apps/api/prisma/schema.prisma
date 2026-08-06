@@ -18,7 +18,7 @@ model User {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   picture         String?
-  role            UserRole?
+  role            UserRole
   sessions        Session[]
   accounts        Account[]
 

@@ -1,116 +1,64 @@
-import { UsersRepository } from '@infra/database/repositories/users.repository';
+import { getErrorMessage } from '@common/filters/http-exception.filter';
+import { PrismaService } from '@infra/database/prisma.service';
+import { Codes } from '@kikos/shared';
 import {
-  BadRequestException,
   HttpException,
   HttpStatus,
-  Injectable,
-  NotFoundException,
+  Injectable
 } from '@nestjs/common';
-import { mapGetUserToResponse } from './users.mapper';
+import * as bcrypt from 'bcryptjs';
 import { CreateUserDto } from './dto/request/create-user.dto';
-import { Codes, formatErrorMessage } from '@kikos/shared';
-import { UserSettingsRepository } from '@infra/database/repositories/user-settings.repository';
-import { UserProfilesRepository } from '@infra/database/repositories/user-profiles.repository';
-import slugify from 'slugify';
-import { UserResponseDto } from './dto/response/user-response.dto';
+import { mapGetUserToResponse } from './users.mapper';
+import { ROUNDS_OF_HASHING } from '@common/config/app';
 
 @Injectable()
 export class UsersService {
   constructor(
-    private usersRepository: UsersRepository,
-    private userSettingsRepository: UserSettingsRepository,
-    private userProfilesRepository: UserProfilesRepository,
-  ) {}
+    private prismaService: PrismaService,
+  ) { }
 
-  async get(userId: string) {
-    const user = await this.usersRepository.get({
+  async get(id: string) {
+    const user = await this.prismaService.user.findFirst({
       where: {
-        id: userId,
-      },
+        id,
+      }
     });
 
     if (!user) {
-      throw new NotFoundException(
-        formatErrorMessage(Codes.AUTH__USER_NOT_FOUND),
-        {
-          cause: new Error(Codes.AUTH__USER_NOT_FOUND),
-        },
-      );
+      throw new HttpException(getErrorMessage(Codes.AUTH__USER_NOT_FOUND), HttpStatus.NOT_FOUND);
     }
 
     return mapGetUserToResponse(user);
   }
 
-  async create(
-    data: CreateUserDto,
-    companyId: string,
-  ): Promise<UserResponseDto> {
-    const { email, name, role, profile, settings, status } = data;
 
-    const lowercaseEmail = email.toLowerCase();
+  async create(data: CreateUserDto) {
+    const password = data.password;
 
-    const userAlreadyExists = await this.usersRepository.get({
-      where: { email: { equals: lowercaseEmail, mode: 'insensitive' } },
-    });
+    const emailLowercase = data.email.toLowerCase();
 
-    if (userAlreadyExists) {
-      throw new BadRequestException(
-        formatErrorMessage(Codes.AUTH__EMAIL_ALREADY_IN_USE),
-        {
-          cause: new Error(Codes.AUTH__EMAIL_ALREADY_IN_USE),
+    const userAlreadyExistsByEmail = await this.prismaService.user.findFirst({
+      where: {
+        email: {
+          equals: emailLowercase,
+          mode: 'insensitive',
         },
-      );
-    }
-
-    const user = await this.usersRepository.create({
-      company: { connect: { id: companyId } },
-      email: lowercaseEmail,
-      name,
-      role,
-      status,
+      },
     });
 
-    const username = slugify(profile?.username || user.name, {
-      lower: true,
-      strict: true,
+    if (userAlreadyExistsByEmail)
+      throw new HttpException(getErrorMessage(Codes.AUTH__EMAIL_ALREADY_IN_USE), HttpStatus.BAD_REQUEST);
+
+    const passwordHash = await bcrypt.hash(password, bcrypt.genSaltSync(ROUNDS_OF_HASHING));
+
+    const user = await this.prismaService.user.create({
+      data: {
+        email: emailLowercase,
+        name: data.name,
+        password: passwordHash,
+        role: data.role,
+      },
     });
-
-    if (profile) {
-      await this.userProfilesRepository.create({
-        user: { connect: { id: user.id } },
-        document: profile.document,
-        username: username,
-        documentType: profile.documentType,
-        maritalStatus: profile?.maritalStatus,
-        nationality: profile?.nationality,
-        profession: profile?.profession,
-        phone: profile?.phone,
-      });
-    }
-
-    if (!profile) {
-      await this.userProfilesRepository.create({
-        user: { connect: { id: user.id } },
-        username: username,
-      });
-    }
-
-    if (settings) {
-      await this.userSettingsRepository.create({
-        user: { connect: { id: user.id } },
-        configurationStatus: settings?.configurationStatus,
-        locale: settings?.locale,
-        maxCommission: settings?.maxCommission,
-        minCommission: settings?.minCommission,
-        timezone: settings?.timezone,
-      });
-    }
-
-    if (!settings) {
-      await this.userSettingsRepository.create({
-        user: { connect: { id: user.id } },
-      });
-    }
 
     return mapGetUserToResponse(user);
   }

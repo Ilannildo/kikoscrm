@@ -1,8 +1,7 @@
-import { User } from '@kikos/db';
+import { UserEntity } from '@infra/entities/user.entity';
 import { UserResponseDto } from './dto/response/user-response.dto';
 
-export function mapGetUserToResponse(user?: User): UserResponseDto | undefined {
-  if (!user) return;
+export function mapGetUserToResponse(user: UserEntity): UserResponseDto {
 
   return {
     id: user.id,
@@ -11,10 +10,9 @@ export function mapGetUserToResponse(user?: User): UserResponseDto | undefined {
     role: user.role,
     updatedAt: user.updatedAt,
     createdAt: user.createdAt,
-    status: user.status,
   };
 }
 
-export function mapListUsersToResponse(users: User[]): UserResponseDto[] {
+export function mapListUsersToResponse(users: UserEntity[]): UserResponseDto[] {
   return users.map((user) => mapGetUserToResponse(user));
 }

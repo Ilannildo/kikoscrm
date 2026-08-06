@@ -1,57 +1,36 @@
-import { UserRoleGuard } from '@common/guards/user-role.guard';
+import { UserRoles } from '@common/decorators/user-role.decorator';
+import { UserRole } from '@kikos/shared';
 import {
   Body,
   Controller,
   Get,
-  Post,
-  Request,
-  UseGuards,
+  Post
 } from '@nestjs/common';
-import { AuthGuard } from '@nestjs/passport';
 import { ApiTags } from '@nestjs/swagger';
-import { UsersService } from './users.service';
-import { AuthenticatedRequest } from '@common/types/authenticated-request';
+import { Session, UserSession } from '@thallesp/nestjs-better-auth';
 import { CreateUserDto } from './dto/request/create-user.dto';
-import { LogsService } from '@module/logs/logs.service';
-import { IpAddress } from '@common/decorators/ip-address.decorator';
-import { LogAction, LogEntity, Role } from '@kikos/shared';
-import { UserRoles } from '@common/decorators/user-role.decorator';
+import { UsersService } from './users.service';
 
 @ApiTags('Usuários')
-@UseGuards(UserRoleGuard)
-@UseGuards(AuthGuard('jwt'))
 @Controller('/users')
 export class UsersController {
   constructor(
     private readonly usersService: UsersService,
-    private logsService: LogsService,
-  ) {}
+  ) { }
 
   @Get('/me')
-  async me(@Request() req: AuthenticatedRequest) {
-    const user = req.user;
-
+  async me(@Session() session: UserSession) {
+    const user = session.user;
     return this.usersService.get(user.id);
   }
 
-  @UserRoles(Role.ADMIN)
+  @UserRoles(UserRole.admin)
   @Post('/')
   async create(
-    @Request() req: AuthenticatedRequest,
-    @IpAddress() ipAddress: string,
     @Body() data: CreateUserDto,
   ) {
-    const response = await this.usersService.create(data, req.user.companyId);
+    const response = await this.usersService.create(data);
 
-    await this.logsService.create({
-      action: LogAction.CREATE,
-      entity: LogEntity.USER,
-      userId: req.user.id,
-      companyId: req.user.companyId,
-      body: data,
-      description: `${req.user.name} criou o usuário ${response.name}`,
-      ipAddress,
-    });
 
     return response;
   }

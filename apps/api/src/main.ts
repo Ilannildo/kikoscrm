@@ -1,18 +1,16 @@
-import { NestFactory, Reflector } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { CORS_ALLOWED_ORIGINS } from 'src/common/config/app';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { LoggerService } from 'src/infra/logger/logger.service';
-import { ResponseInterceptor } from './infra/response/response.interceptor';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { env } from './env';
-import { apiReference } from '@scalar/nestjs-api-reference';
-import { ClassSerializerInterceptor } from '@nestjs/common';
 import { HttpExceptionFilter } from '@common/filters/http-exception.filter';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { apiReference } from '@scalar/nestjs-api-reference';
+import helmet from 'helmet';
 import { LoggerErrorInterceptor } from 'nestjs-pino';
-import { patchNestJsSwagger } from 'nestjs-zod';
-
-patchNestJsSwagger();
+import { CORS_ALLOWED_ORIGINS } from 'src/common/config/app';
+import { LoggerService } from 'src/infra/logger/logger.service';
+import { AppModule } from './app.module';
+import { env } from './env';
+import { ResponseInterceptor } from './infra/response/response.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -23,33 +21,87 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   // DOMAIN
-  app.set('trust proxy', 'loopback');
+  app.set('trust proxy', true);
   app.enableCors({
     origin: CORS_ALLOWED_ORIGINS,
+    credentials: true,
   });
 
   // LOGGER
   const LoggerServiceInstance = app.get(LoggerService);
   app.useLogger(LoggerServiceInstance);
   app.useGlobalInterceptors(new LoggerErrorInterceptor());
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));  
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      stopAtFirstError: true,
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  );
   // RESPONSE
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.enableShutdownHooks();
 
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: {
+        policy: 'cross-origin',
+      },
+
+      crossOriginEmbedderPolicy: false,
+
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: [`'self'`],
+
+          connectSrc: [
+            `'self'`,
+            'https://api.scalar.com',
+            'https://cdn.jsdelivr.net',
+          ],
+
+          scriptSrc: [
+            `'self'`,
+            'https://cdn.jsdelivr.net',
+            `'unsafe-inline'`,
+            `'unsafe-eval'`,
+          ],
+
+          styleSrc: [
+            `'self'`,
+            `'unsafe-inline'`,
+            'https://cdn.jsdelivr.net',
+            'https://fonts.googleapis.com',
+            'https://unpkg.com',
+          ],
+
+          fontSrc: [
+            `'self'`,
+            'https://fonts.gstatic.com',
+            'data:',
+          ],
+
+          imgSrc: [
+            `'self'`,
+            'data:',
+            'https://cdn.jsdelivr.net',
+            'https:',
+          ],
+        },
+      },
+    }),
+  );
+
   // SWAGGER
   const config = new DocumentBuilder()
-    .setTitle('kikos Docs')
-    .setVersion(env.APP_VERSION)
+    .setTitle('Kikos CRM Docs')
     .setContact(
-      'kikos',
-      'https://kikos.com.br',
-      'contato@kikos.com.br',
+      'Ilannildo Viana',
+      'https://ilannildo.com.br',
+      'ilannildoviana12@gmail.com',
     )
-    .addSecurity('bearer', {
-      type: 'http',
-      scheme: 'bearer',
-    })
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
@@ -57,15 +109,32 @@ async function bootstrap() {
   app.use(
     '/docs',
     apiReference({
-      spec: {
-        content: document,
-      },
+      title: `${env.APP_NAME} API Reference`,
+      hideModels: true, hideClientButton: true,
+      showDeveloperTools: 'localhost',
+      defaultOpenAllTags: true,
+      theme: 'kepler',
+      sources: [
+        {
+          content: document,
+          title: 'Kikos CRM API',
+          slug: 'api',
+          default: true,
+        },
+        {
+          url: '/auth/open-api/generate-schema',
+          title: 'Autenticação',
+          slug: 'auth',
+        },
+      ],
     }),
   );
 
-  await app.listen(env.APP_PORT).then(() => {
+  const PORT = env.PORT || 3000;
+
+  await app.listen(PORT).then(() => {
     LoggerServiceInstance.log(
-      `${env.APP_NAME.toUpperCase()} is running on port ${env.APP_PORT} 🔥`,
+      `${env.APP_NAME} api is running on port ${PORT} 🔥`,
     );
   });
 }

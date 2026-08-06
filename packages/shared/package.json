@@ -17,6 +17,7 @@
     "typescript": "5.8.3"
   },
   "dependencies": {
-    "zod": "^3.24.2"
-  }  
+    "nestjs-zod": "^5.5.0",
+    "zod": "^4.4.3"
+  }
 }

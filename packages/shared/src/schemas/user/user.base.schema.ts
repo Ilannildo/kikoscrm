@@ -13,8 +13,8 @@ export const UserSchema = z.object({
     .string({ message: "O email é um campo obrigatório" })
     .email("Formato de e-mail inválido")
     .describe("Endereço de e-mail do usuário"),
-  updatedAt: z.date().describe("Data da última atualização do usuário"),
-  createdAt: z.date().describe("Data de criação do usuário"),
+  updatedAt: z.iso.datetime().describe("Data da última atualização do usuário"),
+  createdAt: z.iso.datetime().describe("Data de criação do usuário"),
   role: z.nativeEnum(UserRole).describe("Função atribuída ao usuário"),  
 });
 

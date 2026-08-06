@@ -172,6 +172,22 @@ export function formatErrorMessage(errorCode: Codes): string {
       return 'Não foi possível recuperar essa informação.';
     case 'entity/already-exists':
       return 'Já existe um registro';
+    case 'crm/lead-not-found':
+      return 'Lead não encontrado.';
+    case 'crm/deal-not-found':
+      return 'Negócio não encontrado.';
+    case 'crm/comment-not-found':
+      return 'Comentário não encontrado.';
+    case 'crm/seller-not-found':
+      return 'Vendedor não encontrado.';
+    case 'crm/forbidden':
+      return 'Você não tem permissão para realizar esta operação.';
+    case 'crm/validation-error':
+      return 'Dados inválidos.';
+    case 'crm/invalid-deal-status-transition':
+      return 'Transição de status do negócio não permitida.';
+    case 'crm/invalid-comment-target':
+      return 'Comentário deve pertencer a um lead ou negócio.';
     case 'auth/internal-error':
       return 'O servidor encontrou um erro inesperado ao tentar processar a solicitação.';
     case 'auth/user-not-company':

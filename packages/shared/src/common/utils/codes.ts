@@ -88,4 +88,12 @@ export enum Codes {
   ENTITY__NOT_FOUND = 'entity/not-found',
   ENTITY__ALREADY_EXISTS = 'entity/already-exists',
   AUTH__FILE__NOT_FOUND = 'auth/file-not-found',
+  CRM__LEAD_NOT_FOUND = 'crm/lead-not-found',
+  CRM__DEAL_NOT_FOUND = 'crm/deal-not-found',
+  CRM__COMMENT_NOT_FOUND = 'crm/comment-not-found',
+  CRM__SELLER_NOT_FOUND = 'crm/seller-not-found',
+  CRM__FORBIDDEN = 'crm/forbidden',
+  CRM__VALIDATION_ERROR = 'crm/validation-error',
+  CRM__INVALID_DEAL_STATUS_TRANSITION = 'crm/invalid-deal-status-transition',
+  CRM__INVALID_COMMENT_TARGET = 'crm/invalid-comment-target',
 }

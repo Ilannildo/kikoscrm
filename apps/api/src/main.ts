@@ -6,11 +6,11 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import helmet from 'helmet';
 import { LoggerErrorInterceptor } from 'nestjs-pino';
-import { CORS_ALLOWED_ORIGINS } from 'src/common/config/app';
-import { LoggerService } from 'src/infra/logger/logger.service';
 import { AppModule } from './app.module';
 import { env } from './env';
 import { ResponseInterceptor } from './infra/response/response.interceptor';
+import { CORS_ALLOWED_ORIGINS } from '@common/config/app';
+import { LoggerService } from '@infra/logger/logger.service';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {

@@ -8,8 +8,8 @@ export function mapGetUserToResponse(user: UserEntity): UserResponseDto {
     email: user.email,
     name: user.name,
     role: user.role,
-    updatedAt: user.updatedAt,
-    createdAt: user.createdAt,
+    updatedAt: user.updatedAt.toISOString(),
+    createdAt: user.createdAt.toISOString(),
   };
 }
 

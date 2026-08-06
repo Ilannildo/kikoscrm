@@ -24,7 +24,13 @@ model User {
 
   image String?
 
+  leads            Lead[]     @relation("SellerLeads")
+  deals            Deal[]     @relation("SellerDeals")
+  comments         Comment[]
+  activities       Activity[]
+
   @@index([email], type: Hash)
+  @@index([role])
   @@map("users")
 }
 
@@ -76,7 +82,118 @@ model Verification {
   @@map("verification")
 }
 
+model Lead {
+  id        String     @id @default(cuid())
+  name      String     @db.VarChar(200)
+  email     String?    @db.VarChar(320)
+  phone     String?    @db.VarChar(30)
+  company   String?    @db.VarChar(200)
+  source    String?    @db.VarChar(100)
+  notes     String?    @db.Text
+  status    LeadStatus @default(new)
+  sellerId  String
+  seller    User       @relation("SellerLeads", fields: [sellerId], references: [id], onDelete: Restrict)
+  deals     Deal[]
+  comments  Comment[]
+  activities Activity[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@index([sellerId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([source])
+  @@map("leads")
+}
+
+model Deal {
+  id          String     @id @default(cuid())
+  name        String     @db.VarChar(200)
+  value       Decimal    @db.Decimal(14, 2)
+  status      DealStatus @default(new)
+  description String?    @db.Text
+  leadId      String
+  lead        Lead       @relation(fields: [leadId], references: [id], onDelete: Restrict)
+  sellerId    String
+  seller      User       @relation("SellerDeals", fields: [sellerId], references: [id], onDelete: Restrict)
+  comments    Comment[]
+  activities  Activity[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([status])
+  @@index([sellerId])
+  @@index([leadId])
+  @@index([createdAt])
+  @@index([value])
+  @@map("deals")
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String   @db.VarChar(2000)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Restrict)
+  leadId    String?
+  lead      Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  dealId    String?
+  deal      Deal?    @relation(fields: [dealId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([leadId])
+  @@index([dealId])
+  @@index([createdAt])
+  @@index([authorId])
+  @@map("comments")
+}
+
+model Activity {
+  id        String       @id @default(cuid())
+  type      ActivityType
+  metadata  Json?
+  leadId    String?
+  lead      Lead?        @relation(fields: [leadId], references: [id], onDelete: SetNull)
+  dealId    String?
+  deal      Deal?        @relation(fields: [dealId], references: [id], onDelete: SetNull)
+  userId    String?
+  user      User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime     @default(now())
+
+  @@index([type])
+  @@index([createdAt])
+  @@index([leadId])
+  @@index([dealId])
+  @@map("activities")
+}
+
 enum UserRole {
   admin
   seller
+}
+
+enum LeadStatus {
+  new
+  contacted
+  qualified
+  converted
+  lost
+}
+
+enum DealStatus {
+  new
+  in_progress
+  won
+  lost
+}
+
+enum ActivityType {
+  LEAD_CREATED
+  LEAD_UPDATED
+  DEAL_CREATED
+  DEAL_UPDATED
+  DEAL_STATUS_CHANGED
+  COMMENT_CREATED
+  DEAL_WON
+  DEAL_LOST
 }

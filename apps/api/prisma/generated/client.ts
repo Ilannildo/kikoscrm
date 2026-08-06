@@ -59,3 +59,23 @@ export type Account = Prisma.AccountModel
  * 
  */
 export type Verification = Prisma.VerificationModel
+/**
+ * Model Lead
+ * 
+ */
+export type Lead = Prisma.LeadModel
+/**
+ * Model Deal
+ * 
+ */
+export type Deal = Prisma.DealModel
+/**
+ * Model Comment
+ * 
+ */
+export type Comment = Prisma.CommentModel
+/**
+ * Model Activity
+ * 
+ */
+export type Activity = Prisma.ActivityModel

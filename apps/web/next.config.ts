@@ -1,4 +1,4 @@
-import("./src/env");
+import("./src/env.mjs");
 
 import type { NextConfig } from "next";
 

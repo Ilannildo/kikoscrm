@@ -14,6 +14,7 @@ export const createQueryClient = () =>
         placeholderData: keepPreviousData,
         refetchOnMount: false,
         retry: false,
+        gcTime: 5 * 60_000,
       },
       dehydrate: {
         serializeData: SuperJSON.serialize,

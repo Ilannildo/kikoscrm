@@ -1,4 +1,4 @@
-import { Role } from "@kikos/shared";
+import { UserRole } from "@kikos/shared";
 
 export const API_AUTH_PREFIX = "/api/auth";
 
@@ -8,6 +8,6 @@ export const PROTECTED_ROUTES = [
   // dashboard
   {
     route: "/dashboard",
-    roles: [Role.ADMIN, Role.EMPLOYEE],
+    roles: [UserRole.admin, UserRole.seller],
   },
 ];

@@ -5,47 +5,44 @@
     ],
     "module": "CommonJS",
     "target": "es2022",
-    "allowJs": true,
-    "declaration": true,
-    "removeComments": true,
+    "allowJs": false,
+    "declaration": false,
+    "removeComments": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "./",
-    "incremental": true,    
+    "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": null,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
+    "strict": false,
+    "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
-    "jsx": "react-jsx",    
+    "jsx": "react-jsx",
     "paths": {
       "@module/*": [
-        "src/modules/*"
+        "./src/modules/*"
       ],
       "@common/*": [
-        "src/common/*"
+        "./src/common/*"
       ],
       "@http/*": [
-        "src/http/*"
+        "./src/http/*"
       ],
       "@infra/*": [
-        "src/infra/*"
-      ],
-      "@docs/*": [
-        "src/docs/*"
+        "./src/infra/*"
       ],
       "@test/*": [
         "./test/*"
       ],
       "@utils/*": [
-        "src/utils/*"
+        "./src/utils/*"
+      ],
+      "prisma/*": [
+        "./prisma/*"
       ],
       "@/*": [
-        "src/*"
+        "./src/*"
       ]
     }
   }

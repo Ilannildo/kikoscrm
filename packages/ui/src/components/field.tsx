@@ -54,7 +54,7 @@ function FieldGroup({ className, ...props }: React.ComponentProps<'div'>) {
 }
 
 const fieldVariants = cva(
-	'group/field data-[invalid=true]:text-red-500 flex w-full gap-1 dark:data-[invalid=true]:text-red-900',
+	'group/field data-[invalid=true]:text-destructive flex w-full gap-1',
 	{
 		variants: {
 			orientation: {
@@ -109,7 +109,7 @@ function FieldLabel({ className, ...props }: React.ComponentProps<typeof Label>)
 			className={cn(
 				'group/field-label peer/field-label flex w-fit gap-2 leading-snug group-data-[disabled=true]/field:opacity-50',
 				'has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:flex-col has-[>[data-slot=field]]:rounded-xl has-[>[data-slot=field]]:border *:data-[slot=field]:p-4',
-				'has-data-[state=checked]:border-primary-500 has-data-[state=checked]:bg-stone-500/5 dark:has-data-[state=checked]:border-stone-50 dark:dark:has-data-[state=checked]:bg-stone-50/10 dark:has-data-[state=checked]:bg-stone-500/10',
+				'has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/5',
 				className,
 			)}
 			{...props}
@@ -135,9 +135,9 @@ function FieldDescription({ className, ...props }: React.ComponentProps<'p'>) {
 		<p
 			data-slot="field-description"
 			className={cn(
-				'font-normal text-stone-500 text-xs leading-normal group-has-data-[orientation=horizontal]/field:text-balance dark:text-stone-400',
+				'font-normal text-muted-foreground text-xs leading-normal group-has-data-[orientation=horizontal]/field:text-balance',
 				'nth-last-2:-mt-1 [[data-variant=legend]+&]:-mt-1.5 last:mt-0',
-				'[&>a:hover]:text-stone-900 dark:[&>a:hover]:text-stone-50 [&>a]:underline [&>a]:underline-offset-4',
+				'[&>a:hover]:text-foreground [&>a]:underline [&>a]:underline-offset-4',
 				className,
 			)}
 			{...props}
@@ -165,7 +165,7 @@ function FieldSeparator({
 			<Separator className="absolute inset-0 top-1/2" />
 			{children && (
 				<span
-					className="relative mx-auto block w-fit bg-white px-2 text-stone-500 dark:bg-stone-950 dark:text-stone-400"
+					className="relative mx-auto block w-fit bg-card px-2 text-muted-foreground"
 					data-slot="field-separator-content"
 				>
 					{children}
@@ -211,7 +211,7 @@ function FieldError({
 		<div
 			role="alert"
 			data-slot="field-error"
-			className={cn('font-normal text-red-500 text-sm dark:text-red-900', className)}
+			className={cn('font-normal text-destructive text-sm', className)}
 			{...props}
 		>
 			{content}

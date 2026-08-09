@@ -4,7 +4,6 @@ import * as LabelPrimitive from '@radix-ui/react-label';
 import * as React from 'react';
 import { cn } from '../lib/utils';
 
-
 function Label({ className, ...props }: React.ComponentProps<typeof LabelPrimitive.Root>) {
 	return (
 		<LabelPrimitive.Root
@@ -22,9 +21,8 @@ const Description = React.forwardRef<
 	HTMLParagraphElement,
 	React.HTMLAttributes<HTMLParagraphElement>
 >(({ className, ...props }, ref) => (
-	<p ref={ref} className={cn('text-stone-500 text-xs dark:text-stone-400', className)} {...props} />
+	<p ref={ref} className={cn('text-muted-foreground text-xs', className)} {...props} />
 ));
 Description.displayName = 'Description';
 
 export { Description, Label };
-

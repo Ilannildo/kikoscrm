@@ -83,7 +83,7 @@ const { data: commentsData, isLoading, isError, refetch } =
               {deal.name}
             </h3>
             <div className="mt-1 flex items-center justify-between">
-              <span className="text-xl font-bold text-accent">
+<span className="text-xl font-bold text-kikos">
                 {formatCurrency(deal.value)}
               </span>
               <Badge variant={DEAL_STATUS_META[deal.status].badge}>
@@ -172,7 +172,7 @@ const { data: commentsData, isLoading, isError, refetch } =
                         {timeAgo(c.createdAt)}
                       </span>
                     </div>
-                    <p className="mt-2 text-[13px] text-muted-foreground">
+<p className="mt-2 text-[13px] text-foreground/90">
                       {c.content}
                     </p>
                   </li>

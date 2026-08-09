@@ -8,6 +8,7 @@ import { Button } from "@kikos/ui/components/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@kikos/ui/components/field";
 import { Input } from "@kikos/ui/components/input";
 import { KikosLogo } from "@kikos/ui/components/kikos-logo";
+import { useToast } from "@kikos/ui/components/toast";
 import { Target } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
@@ -15,6 +16,7 @@ import { Controller, useForm } from "react-hook-form";
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = React.useState(false);
+  const { toast } = useToast();
 
   const form = useForm<ISignUpRequest>({
     resolver: zodResolver(SignUpRequestSchema),
@@ -32,9 +34,11 @@ export default function RegisterPage() {
       onError(error) {
         setIsLoading(false);
         console.log(error.error)
-        // toast.error(message ?? 'Email ou senha incorretos', {
-        //   position: 'top-right',
-        // });
+        toast({
+          title: "Login",
+          description: error.error.message ?? 'Erro ao cadastrar',
+          variant: "error"
+        })
         return
       },
     });
@@ -53,7 +57,7 @@ export default function RegisterPage() {
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
           <KikosLogo size="lg" />
-          <p className="text-sm text-[#71717a] mt-3">Crie sua conta e comece a usar o Kikos CRM</p>
+          <p className="text-sm text-muted-foreground mt-3">Crie sua conta e comece a usar o Kikos CRM</p>
         </div>
 
         <form className="space-y-4 rounded-xl border border-border/60 bg-card p-6 shadow-sm" id="register-in-form" onSubmit={form.handleSubmit(onSubmit)}>
@@ -134,7 +138,7 @@ export default function RegisterPage() {
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Já tem conta?{" "}
-          <Link href="/login" className="font-medium text-accent hover:underline">
+          <Link href="/login" className="font-medium text-accent-foreground hover:underline">
             Entrar
           </Link>
         </p>

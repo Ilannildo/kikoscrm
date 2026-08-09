@@ -17,13 +17,13 @@ export default function GlobalError({ error, reset }: Props) {
 	}, [error]);
 
 	return (
-		<div className="flex min-h-dvh flex-col items-center justify-center bg-white px-4 py-12 sm:px-6 lg:px-8">
+<div className="flex min-h-dvh flex-col items-center justify-center bg-background px-4 py-12 sm:px-6 lg:px-8">
 			<div className="mx-auto max-w-md text-center">
 				<div className="mx-auto h-12 w-12 text-primary" />
 				<h1 className="mt-4 font-bold text-3xl text-foreground tracking-tight sm:text-4xl">
 					Oops 🙁!
 				</h1>
-				<p className="mt-4 text-stone-400">
+<p className="mt-4 text-muted-foreground">
 					Lamentamos, mas ocorreu um erro inesperado. Tente novamente mais tarde ou entre em contato
 					com o suporte se o problema persistir.
 				</p>

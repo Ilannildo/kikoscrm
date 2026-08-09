@@ -36,7 +36,7 @@ export function DealCard({
       <p className="truncate text-[13px] font-medium text-foreground">
         {deal.name}
       </p>
-      <p className="mt-1 text-sm font-semibold text-accent">
+<p className="mt-1 text-sm font-semibold text-kikos">
         {formatCompactCurrency(deal.value)}
       </p>
 

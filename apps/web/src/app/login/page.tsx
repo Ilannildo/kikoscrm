@@ -10,9 +10,11 @@ import { Target } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 import { Controller, useForm } from 'react-hook-form';
+import { useToast } from "@kikos/ui/components/toast";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = React.useState(false);
+  const {toast} = useToast()
 
   const form = useForm<ISignInRequest>({
     resolver: zodResolver(SignInRequestSchema),
@@ -31,7 +33,12 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-      setIsLoading(false);
+      setIsLoading(false);    
+      toast({
+        title: "Login",
+        description: result.error.message ?? 'Verifique suas credenciais',
+        variant: "error"
+      })  
 
       return
     }
@@ -49,12 +56,12 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center mb-8">
           <KikosLogo size="lg" />
-          <p className="text-sm text-[#71717a] mt-3">Entre na sua conta corporativa para continuar</p>
+<p className="text-sm text-muted-foreground mt-3">Entre na sua conta corporativa para continuar</p>
         </div>
 
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 rounded-xl border border-border/60 bg-card p-6 shadow-sm">
-          <FieldGroup className="grid-2 mt-10 mb-6 gap-6 md:grid-cols-2">
+<FieldGroup className="mt-10 mb-6 gap-6">
             <Controller
               control={form.control}
               name="email"
@@ -96,13 +103,7 @@ export default function LoginPage() {
                 </Field>
               )}
             />
-          </FieldGroup>
-
-          <div className="mb-6 flex w-full justify-end">
-            <Link className="font-normal text-sm text-stone-800" href="/recover-password">
-              Esqueceu sua senha?
-            </Link>
-          </div>
+          </FieldGroup>          
 
           <div className="mb-6 w-full">
             <Button
@@ -119,7 +120,7 @@ export default function LoginPage() {
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
           Não tem conta?{" "}
-          <Link href="/register" className="font-medium text-accent hover:underline">
+          <Link href="/register" className="font-medium text-accent-foreground hover:underline">
             Criar conta
           </Link>
         </p>

@@ -5,8 +5,8 @@ import { AllowAnonymous } from '@thallesp/nestjs-better-auth';
 @ApiExcludeController()
 @ApiTags('Health')
 @Controller('/health')
-@AllowAnonymous()
 export class HealthController {
+	@AllowAnonymous()
 	@Get()
 	health() {
 		return {

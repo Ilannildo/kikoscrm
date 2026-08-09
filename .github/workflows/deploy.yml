@@ -134,10 +134,10 @@ jobs:
           kubectl apply -f infra/k8s/api/service.yaml
           kubectl apply -f infra/k8s/api/deployment.yaml
 
-      - name: Apply Web resources
-        run: |
-          kubectl apply -f infra/k8s/web/service.yaml
-          kubectl apply -f infra/k8s/web/deployment.yaml
+      # - name: Apply Web resources
+      #   run: |
+      #     kubectl apply -f infra/k8s/web/service.yaml
+      #     kubectl apply -f infra/k8s/web/deployment.yaml
 
 
       # ==========================================================

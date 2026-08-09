@@ -2,7 +2,6 @@ import { randomUUID } from 'node:crypto';
 import { PrismaClient } from './generated/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import * as bcrypt from 'bcryptjs';
-import { ROUNDS_OF_HASHING } from '../src/common/config/app';
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL,
@@ -25,7 +24,7 @@ const PASSWORD = '12345678';
  */
 async function hashPassword(password: string) {
 
-  return await bcrypt.hash(password, ROUNDS_OF_HASHING)
+  return await bcrypt.hash(password, 10)
 }
 
 /**

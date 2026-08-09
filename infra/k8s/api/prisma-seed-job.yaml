@@ -1,0 +1,35 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kikos-prisma-seed
+  namespace: kikos
+spec:
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+
+      imagePullSecrets:
+        - name: regcred
+
+      containers:
+        - name: prisma-seed
+          image: ghcr.io/ilannildo/kikos-api:latest
+          imagePullPolicy: Always
+
+          workingDir: /app/apps/api
+
+          command:
+            - pnpm
+
+          args:
+            - exec
+            - prisma
+            - db
+            - seed
+
+          envFrom:
+            - configMapRef:
+                name: kikos-api-config
+            - secretRef:
+                name: kikos-api-secrets

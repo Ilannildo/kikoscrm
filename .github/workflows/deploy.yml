@@ -81,6 +81,9 @@ jobs:
           context: .
           file: docker/web.Dockerfile
           push: true
+          build-args: |            
+            NEXT_PUBLIC_API_URL=https://api.kikos.teragestor.com.br
+            NEXT_PUBLIC_URL=https://app.kikos.teragestor.com.br
           tags: |
             ${{ env.IMAGE_PREFIX }}/kikos-web:${{ steps.vars.outputs.tag }}
             ${{ env.IMAGE_PREFIX }}/kikos-web:latest
@@ -136,40 +139,38 @@ jobs:
       # PRISMA MIGRATION
       # ==========================================================
 
-      # - name: Run Prisma migration
-      #   env:
-      #     IMAGE_TAG: ${{ steps.vars.outputs.tag }}
-      #   run: |
-      #     set -euo pipefail
+      - name: Run Prisma migration
+        env:
+          IMAGE_TAG: ${{ steps.vars.outputs.tag }}
+        run: |
+          set -euo pipefail
 
-      #     echo "🔹 Running Prisma migration"
+          echo "🔹 Running Prisma migration"
 
-      #     kubectl delete job kikos-prisma-migrate \
-      #       -n "${NAMESPACE}" \
-      #       --ignore-not-found
+          kubectl delete job kikos-prisma-migrate \
+            -n "${NAMESPACE}" \
+            --ignore-not-found
 
-      #     sed "s|IMAGE_TAG|${IMAGE_TAG}|g" \
-      #       infra/k8s/api/prisma-migrate-job.yaml \
-      #       | kubectl apply -f -
+          kubectl apply -f infra/k8s/api/prisma-migrate-job.yaml
 
-      #     if ! kubectl wait \
-      #       --for=condition=complete \
-      #       job/kikos-prisma-migrate \
-      #       -n "${NAMESPACE}" \
-      #       --timeout=240s; then
+          if ! kubectl wait \
+            --for=condition=complete \
+            job/kikos-prisma-migrate \
+            -n "${NAMESPACE}" \
+            --timeout=240s; then
 
-      #       echo "❌ Prisma migration failed"
+            echo "❌ Prisma migration failed"
 
-      #       kubectl logs \
-      #         job/kikos-prisma-migrate \
-      #         -n "${NAMESPACE}" \
-      #         --all-containers=true \
-      #         || true
+            kubectl logs \
+              job/kikos-prisma-migrate \
+              -n "${NAMESPACE}" \
+              --all-containers=true \
+              || true
 
-      #       exit 1
-      #     fi
+            exit 1
+          fi
 
-      #     echo "✅ Prisma migration completed"
+          echo "✅ Prisma migration completed"
 
       # ==========================================================
       # UPDATE API IMAGE

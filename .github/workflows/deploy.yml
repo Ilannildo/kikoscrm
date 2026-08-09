@@ -229,6 +229,7 @@ jobs:
       - name: Apply Gateway API resources
         run: |
           kubectl apply -f infra/k8s/traefik/gateway.yaml          
+          kubectl apply -f infra/k8s/api/httproute.yaml          
           kubectl apply -f infra/k8s/traefik/gatewayclass.yaml          
 
 
@@ -248,8 +249,7 @@ jobs:
         run: |
           kubectl wait \
             --for=condition=Ready \
-            certificate/kikos-cert \
-            -n "${NAMESPACE}" \
+            certificate/kikos-cert \            
             --timeout=180s
 
           echo "✅ TLS certificate is ready"

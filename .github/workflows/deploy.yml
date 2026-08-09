@@ -249,7 +249,7 @@ jobs:
         run: |
           kubectl wait \
             --for=condition=Ready \
-            certificate/kikos-cert \            
+            certificate/kikos-cert \  
             --timeout=180s
 
           echo "✅ TLS certificate is ready"

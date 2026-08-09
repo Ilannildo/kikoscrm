@@ -34,11 +34,9 @@ export const CreateDealSchema = z.object({
 
 export type CreateDealDto = z.infer<typeof CreateDealSchema>;
 
-export const UpdateDealSchema = z.object({
-  name: z.string().min(2).optional(),
-  value: monetaryValueSchema.optional(),
-  description: z.string().max(5000).optional().nullable(),
-  leadId: z.string().optional(),
+export const UpdateDealSchema = CreateDealSchema.partial().omit({
+  status: true,
+  sellerId: true
 });
 
 export type UpdateDealDto = z.infer<typeof UpdateDealSchema>;

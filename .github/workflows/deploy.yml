@@ -228,9 +228,8 @@ jobs:
 
       - name: Apply Gateway API resources
         run: |
-          kubectl apply -f infra/k8s/gateway/gateway.yaml
-          kubectl apply -f infra/k8s/gateway/api-httproute.yaml
-          # kubectl apply -f infra/k8s/gateway/web-httproute.yaml
+          kubectl apply -f infra/k8s/traefik/gateway.yaml          
+          kubectl apply -f infra/k8s/traefik/gatewayclass.yaml          
 
 
       # ==========================================================

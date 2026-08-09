@@ -4,10 +4,15 @@ metadata:
   name: kikos-prisma-migrate
   namespace: kikos
 spec:
-  backoffLimit: 2
+  backoffLimit: 0
+
   template:
+    metadata:
+      labels:
+        app: kikos-prisma-migrate
+
     spec:
-      restartPolicy: OnFailure
+      restartPolicy: Never
 
       imagePullSecrets:
         - name: regcred

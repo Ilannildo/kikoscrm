@@ -114,24 +114,18 @@ jobs:
           kubectl apply -f infra/k8s/namespace.yaml
 
       # ==========================================================
-      # API CONFIG
-      # ==========================================================
-
-      - name: Apply API configuration
-        run: |
-          kubectl apply -f infra/k8s/api/configmap.yaml
-
-      # ==========================================================
       # SERVICES
       # ==========================================================
 
       - name: Apply API resources
         run: |
+          kubectl apply -f infra/k8s/api/configmap.yaml
           kubectl apply -f infra/k8s/api/service.yaml
           kubectl apply -f infra/k8s/api/deployment.yaml
 
       - name: Apply Web resources
         run: |
+          kubectl apply -f infra/k8s/web/configmap.yaml
           kubectl apply -f infra/k8s/web/service.yaml
           kubectl apply -f infra/k8s/web/deployment.yaml
 

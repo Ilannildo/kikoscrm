@@ -23,12 +23,6 @@ spec:
             - configMapRef:
                 name: kikos-web-config
             - secretRef:
-                name: kikos-web-secrets
-          readinessProbe:
-            httpGet:
-              path: /health
-              port: 3000
-            initialDelaySeconds: 10
-            periodSeconds: 10
+                name: kikos-web-secrets          
       imagePullSecrets:
               - name: regcred

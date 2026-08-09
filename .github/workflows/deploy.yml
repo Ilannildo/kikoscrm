@@ -32,7 +32,6 @@ jobs:
       - name: Checkout project
         uses: actions/checkout@v4
 
-
       # ==========================================================
       # IMAGE TAG
       # ==========================================================
@@ -56,7 +55,6 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-
       # ==========================================================
       # BUILD + PUSH API
       # ==========================================================
@@ -73,23 +71,28 @@ jobs:
           cache-from: type=gha,scope=kikos-api
           cache-to: type=gha,mode=max,scope=kikos-api
 
-
       # ==========================================================
       # BUILD + PUSH WEB
       # ==========================================================
 
-      # - name: Build and push Web image
-      #   uses: docker/build-push-action@v6
-      #   with:
-      #     context: .
-      #     file: docker/web.Dockerfile
-      #     push: true
-      #     tags: |
-      #       ${{ env.IMAGE_PREFIX }}/kikos-web:${{ steps.vars.outputs.tag }}
-      #       ${{ env.IMAGE_PREFIX }}/kikos-web:latest
-      #     cache-from: type=gha,scope=kikos-web
-      #     cache-to: type=gha,mode=max,scope=kikos-web
+      - name: Build and push Web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/web.Dockerfile
+          push: true
 
+          build-args: |
+            BETTER_AUTH_URL=https://api.kikos.teragestor.com.br
+            NEXT_PUBLIC_API_URL=https://api.kikos.teragestor.com.br
+            NEXT_PUBLIC_URL=https://app.kikos.teragestor.com.br
+
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/kikos-web:${{ steps.vars.outputs.tag }}
+            ${{ env.IMAGE_PREFIX }}/kikos-web:latest
+
+          cache-from: type=gha,scope=kikos-web
+          cache-to: type=gha,mode=max,scope=kikos-web
 
       # ==========================================================
       # KUBERNETES CONTEXT
@@ -106,7 +109,6 @@ jobs:
           kubectl version --client
           kubectl get nodes
 
-
       # ==========================================================
       # NAMESPACE
       # ==========================================================
@@ -115,15 +117,13 @@ jobs:
         run: |
           kubectl apply -f infra/k8s/namespace.yaml
 
-
       # ==========================================================
       # API CONFIG
       # ==========================================================
 
       - name: Apply API configuration
         run: |
-          kubectl apply -f infra/k8s/api/configmap.yaml          
-
+          kubectl apply -f infra/k8s/api/configmap.yaml
 
       # ==========================================================
       # SERVICES
@@ -134,11 +134,10 @@ jobs:
           kubectl apply -f infra/k8s/api/service.yaml
           kubectl apply -f infra/k8s/api/deployment.yaml
 
-      # - name: Apply Web resources
-      #   run: |
-      #     kubectl apply -f infra/k8s/web/service.yaml
-      #     kubectl apply -f infra/k8s/web/deployment.yaml
-
+      - name: Apply Web resources
+        run: |
+          kubectl apply -f infra/k8s/web/service.yaml
+          kubectl apply -f infra/k8s/web/deployment.yaml
 
       # ==========================================================
       # PRISMA MIGRATION
@@ -179,7 +178,6 @@ jobs:
 
       #     echo "✅ Prisma migration completed"
 
-
       # ==========================================================
       # UPDATE API IMAGE
       # ==========================================================
@@ -200,27 +198,25 @@ jobs:
             -n "${NAMESPACE}" \
             --timeout=250s
 
-
       # ==========================================================
       # UPDATE WEB IMAGE
       # ==========================================================
 
-      # - name: Update Web image
-      #   env:
-      #     IMAGE_TAG: ${{ steps.vars.outputs.tag }}
-      #   run: |
-      #     kubectl set image \
-      #       deployment/kikos-crm-web \
-      #       kikos-web=${IMAGE_PREFIX}/kikos-web:${IMAGE_TAG} \
-      #       -n "${NAMESPACE}"
+      - name: Update Web image
+        env:
+          IMAGE_TAG: ${{ steps.vars.outputs.tag }}
+        run: |
+          kubectl set image \
+            deployment/kikos-web \
+            kikos-web=${IMAGE_PREFIX}/kikos-web:${IMAGE_TAG} \
+            -n "${NAMESPACE}"
 
-      # - name: Wait for Web rollout
-      #   run: |
-      #     kubectl rollout status \
-      #       deployment/kikos-crm-web \
-      #       -n "${NAMESPACE}" \
-      #       --timeout=250s
-
+      - name: Wait for Web rollout
+        run: |
+          kubectl rollout status \
+            deployment/kikos-web \
+            -n "${NAMESPACE}" \
+            --timeout=250s
 
       # ==========================================================
       # GATEWAY API
@@ -230,8 +226,8 @@ jobs:
         run: |
           kubectl apply -f infra/k8s/traefik/gateway.yaml          
           kubectl apply -f infra/k8s/api/httproute.yaml          
-          kubectl apply -f infra/k8s/traefik/gatewayclass.yaml          
-
+          kubectl apply -f infra/k8s/web/httproute.yaml          
+          kubectl apply -f infra/k8s/traefik/gatewayclass.yaml
 
       # ==========================================================
       # CERT-MANAGER
@@ -249,7 +245,7 @@ jobs:
         run: |
           kubectl wait \
             --for=condition=Ready \
-            certificate/kikos-cert \  
+            certificate/kikos-cert \
             --timeout=180s
 
           echo "✅ TLS certificate is ready"

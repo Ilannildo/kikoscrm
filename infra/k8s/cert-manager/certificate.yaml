@@ -10,3 +10,4 @@ spec:
     kind: ClusterIssuer
   dnsNames:
     - api.kikos.teragestor.com.br
+    - app.kikos.teragestor.com.br

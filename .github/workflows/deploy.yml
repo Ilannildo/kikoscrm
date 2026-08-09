@@ -122,6 +122,13 @@ jobs:
           kubectl apply -f infra/k8s/api/configmap.yaml
           kubectl apply -f infra/k8s/api/service.yaml
           kubectl apply -f infra/k8s/api/deployment.yaml
+          
+          echo "🔹 Postgres"
+          kubectl apply -f k8s/production/database/postgres/deployment.yaml
+          kubectl apply -f k8s/production/database/postgres/pvc.yaml
+          kubectl apply -f k8s/production/database/postgres/service.yaml
+          kubectl rollout status deployment/postgres -n "${NAMESPACE}" --timeout=180s || truees
+
 
       - name: Apply Web resources
         run: |

@@ -1,0 +1,23 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kikos-prisma-migrate
+  namespace: kikos
+spec:
+  backoffLimit: 2
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: prisma-migrate
+          image: ilannildo/kikos-api:latest
+          imagePullPolicy: Always
+          command: ["pnpm"]
+          args: ["prisma", "migrate", "deploy"]
+          envFrom:
+            - configMapRef:
+                name: kikos-api-config
+            - secretRef:
+                name: kikos-api-secrets
+      imagePullSecrets:
+              - name: regcred

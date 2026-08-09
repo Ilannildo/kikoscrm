@@ -1,0 +1,256 @@
+name: KIKOS CRM Deploy
+
+run-name: ${{ github.actor }} is deploying KIKOS CRM 🚀
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: deploy-kikos-crm
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/kikosfitness
+  NAMESPACE: kikos-crm
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # ==========================================================
+      # CHECKOUT
+      # ==========================================================
+
+      - name: Checkout project
+        uses: actions/checkout@v4
+
+
+      # ==========================================================
+      # IMAGE TAG
+      # ==========================================================
+
+      - name: Set image tag
+        id: vars
+        run: |
+          echo "tag=sha-${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+
+      # ==========================================================
+      # DOCKER
+      # ==========================================================
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+
+      # ==========================================================
+      # BUILD + PUSH API
+      # ==========================================================
+
+      - name: Build and push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/api.Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_PREFIX }}/kikos-api:${{ steps.vars.outputs.tag }}
+            ${{ env.IMAGE_PREFIX }}/kikos-api:latest
+          cache-from: type=gha,scope=kikos-api
+          cache-to: type=gha,mode=max,scope=kikos-api
+
+
+      # ==========================================================
+      # BUILD + PUSH WEB
+      # ==========================================================
+
+      # - name: Build and push Web image
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     context: .
+      #     file: docker/web.Dockerfile
+      #     push: true
+      #     tags: |
+      #       ${{ env.IMAGE_PREFIX }}/kikos-web:${{ steps.vars.outputs.tag }}
+      #       ${{ env.IMAGE_PREFIX }}/kikos-web:latest
+      #     cache-from: type=gha,scope=kikos-web
+      #     cache-to: type=gha,mode=max,scope=kikos-web
+
+
+      # ==========================================================
+      # KUBERNETES CONTEXT
+      # ==========================================================
+
+      - name: Set Kubernetes context
+        uses: azure/k8s-set-context@v4
+        with:
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
+
+      - name: Kubernetes connection
+        run: |
+          kubectl version --client
+          kubectl get nodes
+
+
+      # ==========================================================
+      # NAMESPACE
+      # ==========================================================
+
+      - name: Apply namespace
+        run: |
+          kubectl apply -f infra/k8s/namespace.yaml
+
+
+      # ==========================================================
+      # API CONFIG
+      # ==========================================================
+
+      - name: Apply API configuration
+        run: |
+          kubectl apply -f infra/k8s/api/configmap.yaml          
+
+
+      # ==========================================================
+      # SERVICES
+      # ==========================================================
+
+      - name: Apply API resources
+        run: |
+          kubectl apply -f infra/k8s/api/service.yaml
+          kubectl apply -f infra/k8s/api/deployment.yaml
+
+      - name: Apply Web resources
+        run: |
+          kubectl apply -f infra/k8s/web/service.yaml
+          kubectl apply -f infra/k8s/web/deployment.yaml
+
+
+      # ==========================================================
+      # PRISMA MIGRATION
+      # ==========================================================
+
+      - name: Run Prisma migration
+        env:
+          IMAGE_TAG: ${{ steps.vars.outputs.tag }}
+        run: |
+          set -euo pipefail
+
+          echo "🔹 Running Prisma migration"
+
+          kubectl delete job kikos-crm-prisma-migrate \
+            -n "${NAMESPACE}" \
+            --ignore-not-found
+
+          sed "s|IMAGE_TAG|${IMAGE_TAG}|g" \
+            infra/k8s/api/prisma-migrate-job.yaml \
+            | kubectl apply -f -
+
+          if ! kubectl wait \
+            --for=condition=complete \
+            job/kikos-crm-prisma-migrate \
+            -n "${NAMESPACE}" \
+            --timeout=240s; then
+
+            echo "❌ Prisma migration failed"
+
+            kubectl logs \
+              job/kikos-crm-prisma-migrate \
+              -n "${NAMESPACE}" \
+              --all-containers=true \
+              || true
+
+            exit 1
+          fi
+
+          echo "✅ Prisma migration completed"
+
+
+      # ==========================================================
+      # UPDATE API IMAGE
+      # ==========================================================
+
+      - name: Update API image
+        env:
+          IMAGE_TAG: ${{ steps.vars.outputs.tag }}
+        run: |
+          kubectl set image \
+            deployment/kikos-crm-api \
+            kikos-api=${IMAGE_PREFIX}/kikos-api:${IMAGE_TAG} \
+            -n "${NAMESPACE}"
+
+      - name: Wait for API rollout
+        run: |
+          kubectl rollout status \
+            deployment/kikos-crm-api \
+            -n "${NAMESPACE}" \
+            --timeout=250s
+
+
+      # ==========================================================
+      # UPDATE WEB IMAGE
+      # ==========================================================
+
+      # - name: Update Web image
+      #   env:
+      #     IMAGE_TAG: ${{ steps.vars.outputs.tag }}
+      #   run: |
+      #     kubectl set image \
+      #       deployment/kikos-crm-web \
+      #       kikos-web=${IMAGE_PREFIX}/kikos-web:${IMAGE_TAG} \
+      #       -n "${NAMESPACE}"
+
+      # - name: Wait for Web rollout
+      #   run: |
+      #     kubectl rollout status \
+      #       deployment/kikos-crm-web \
+      #       -n "${NAMESPACE}" \
+      #       --timeout=250s
+
+
+      # ==========================================================
+      # GATEWAY API
+      # ==========================================================
+
+      - name: Apply Gateway API resources
+        run: |
+          kubectl apply -f infra/k8s/gateway/gateway.yaml
+          kubectl apply -f infra/k8s/gateway/api-httproute.yaml
+          # kubectl apply -f infra/k8s/gateway/web-httproute.yaml
+
+
+      # ==========================================================
+      # CERT-MANAGER
+      # ==========================================================
+
+      - name: Apply cert-manager resources
+        run: |
+          kubectl apply \
+            -f infra/k8s/cert-manager/clusterissuer.yaml
+
+          kubectl apply \
+            -f infra/k8s/cert-manager/certificate.yaml
+
+      - name: Wait for certificate
+        run: |
+          kubectl wait \
+            --for=condition=Ready \
+            certificate/kikos-crm-cert \
+            -n "${NAMESPACE}" \
+            --timeout=180s
+
+          echo "✅ TLS certificate is ready"

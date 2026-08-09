@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kikos-api-config
+  namespace: kikos
+data:
+  NODE_ENV: "production"
+  PORT: "8082"  
+  APP_NAME: "kikos"  
+  APP_BASE_URL: "https://api.kikos.teragestor.com.br"    

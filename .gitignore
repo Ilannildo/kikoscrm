@@ -21,6 +21,8 @@ coverage
 # Vercel
 .vercel
 
+infra/k8s/**/secret.yaml
+
 # Build Outputs
 .next/
 out/

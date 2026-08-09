@@ -8,16 +8,27 @@ spec:
   template:
     spec:
       restartPolicy: OnFailure
+
+      imagePullSecrets:
+        - name: regcred
+
       containers:
         - name: prisma-migrate
           image: ghcr.io/ilannildo/kikos-api:latest
           imagePullPolicy: Always
-          command: ["pnpm"]
-          args: ["prisma", "migrate", "deploy"]
+
+          workingDir: /app/apps/api
+
+          command:
+            - pnpm
+          args:
+            - exec
+            - prisma
+            - migrate
+            - deploy
+
           envFrom:
             - configMapRef:
                 name: kikos-api-config
             - secretRef:
                 name: kikos-api-secrets
-      imagePullSecrets:
-              - name: regcred

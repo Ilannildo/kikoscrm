@@ -1,7 +1,7 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: teragestor-cert
+  name: kikos-cert
   namespace: default
 spec:
   secretName: tls-secret
@@ -9,4 +9,4 @@ spec:
     name: letsencrypt-prod
     kind: ClusterIssuer
   dnsNames:
-    - api.teragestor.com.br
+    - api.kikos.teragestor.com.br

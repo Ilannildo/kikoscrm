@@ -17,7 +17,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_PREFIX: ghcr.io/kikosfitness
+  IMAGE_PREFIX: ghcr.io/ilannildo
   NAMESPACE: kikos-crm
 
 jobs:

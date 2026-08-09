@@ -49,7 +49,6 @@ COPY --from=installer /app/ ./
 
 COPY --from=pruner /app/out/full/ ./
 
-RUN pnpm --filter api exec prisma generate
 RUN pnpm turbo run build --filter=api...
 
 # ============================================================

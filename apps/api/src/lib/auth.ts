@@ -17,8 +17,7 @@ export const auth = betterAuth({
 		provider: 'postgresql',
 	}),
 	emailAndPassword: {
-		enabled: true,
-		disableSignUp: false,
+		enabled: true,		
 		password: {
 			hash: async (password) => bcrypt.hash(password, ROUNDS_OF_HASHING),
 			verify: async ({ password, hash }) => bcrypt.compare(password, hash),

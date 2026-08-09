@@ -18,16 +18,16 @@ model User {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   picture         String?
-  role            UserRole
+  role            UserRole  @default(admin)
   sessions        Session[]
   accounts        Account[]
 
   image String?
 
-  leads            Lead[]     @relation("SellerLeads")
-  deals            Deal[]     @relation("SellerDeals")
-  comments         Comment[]
-  activities       Activity[]
+  leads      Lead[]     @relation("SellerLeads")
+  deals      Deal[]     @relation("SellerDeals")
+  comments   Comment[]
+  activities Activity[]
 
   @@index([email], type: Hash)
   @@index([role])
@@ -83,21 +83,21 @@ model Verification {
 }
 
 model Lead {
-  id        String     @id @default(cuid())
-  name      String     @db.VarChar(200)
-  email     String?    @db.VarChar(320)
-  phone     String?    @db.VarChar(30)
-  company   String?    @db.VarChar(200)
-  source    String?    @db.VarChar(100)
-  notes     String?    @db.Text
-  status    LeadStatus @default(new)
-  sellerId  String
-  seller    User       @relation("SellerLeads", fields: [sellerId], references: [id], onDelete: Restrict)
-  deals     Deal[]
-  comments  Comment[]
+  id         String     @id @default(cuid())
+  name       String     @db.VarChar(200)
+  email      String?    @db.VarChar(320)
+  phone      String?    @db.VarChar(30)
+  company    String?    @db.VarChar(200)
+  source     String?    @db.VarChar(100)
+  notes      String?    @db.Text
+  status     LeadStatus @default(new)
+  sellerId   String
+  seller     User       @relation("SellerLeads", fields: [sellerId], references: [id], onDelete: Restrict)
+  deals      Deal[]
+  comments   Comment[]
   activities Activity[]
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
   @@index([sellerId])
   @@index([status])

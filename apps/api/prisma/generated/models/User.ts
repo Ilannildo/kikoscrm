@@ -325,7 +325,7 @@ export type UserCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
@@ -345,7 +345,7 @@ export type UserUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
@@ -405,7 +405,7 @@ export type UserCreateManyInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
 }
 
@@ -609,7 +609,7 @@ export type UserCreateWithoutSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   leads?: Prisma.LeadCreateNestedManyWithoutSellerInput
@@ -628,7 +628,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   leads?: Prisma.LeadUncheckedCreateNestedManyWithoutSellerInput
@@ -701,7 +701,7 @@ export type UserCreateWithoutAccountsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   leads?: Prisma.LeadCreateNestedManyWithoutSellerInput
@@ -720,7 +720,7 @@ export type UserUncheckedCreateWithoutAccountsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   leads?: Prisma.LeadUncheckedCreateNestedManyWithoutSellerInput
@@ -793,7 +793,7 @@ export type UserCreateWithoutLeadsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
@@ -812,7 +812,7 @@ export type UserUncheckedCreateWithoutLeadsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
@@ -885,7 +885,7 @@ export type UserCreateWithoutDealsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
@@ -904,7 +904,7 @@ export type UserUncheckedCreateWithoutDealsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
@@ -977,7 +977,7 @@ export type UserCreateWithoutCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
@@ -996,7 +996,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
@@ -1069,7 +1069,7 @@ export type UserCreateWithoutActivitiesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
@@ -1088,7 +1088,7 @@ export type UserUncheckedCreateWithoutActivitiesInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   picture?: string | null
-  role: $Enums.UserRole
+  role?: $Enums.UserRole
   image?: string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput

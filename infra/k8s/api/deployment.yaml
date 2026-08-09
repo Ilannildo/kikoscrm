@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: kikos-api
-          image: ilannildo/kikos-api:latest
+          image: ghcr.io/ilannildo/kikos-api:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8082

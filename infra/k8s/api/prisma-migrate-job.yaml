@@ -10,7 +10,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: prisma-migrate
-          image: ilannildo/kikos-api:latest
+          image: ghcr.io/ilannildo/kikos-api:latest
           imagePullPolicy: Always
           command: ["pnpm"]
           args: ["prisma", "migrate", "deploy"]

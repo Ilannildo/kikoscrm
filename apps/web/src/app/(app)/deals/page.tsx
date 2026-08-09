@@ -1,21 +1,20 @@
 "use client";
 
-import * as React from "react";
-import { useRouter } from "next/navigation";
-import { Plus, Target, Search } from "lucide-react";
-import { PageHeader } from "@/components/layout/page-header";
-import { Button } from "@kikos/ui/components/button";
-import { Input } from "@kikos/ui/components/input";
-import { Select } from "@kikos/ui/components/select";
-import { Skeleton } from "@kikos/ui/components/skeleton";
-import { EmptyState } from "@kikos/ui/components/empty-state";
-import { ErrorState } from "@kikos/ui/components/error-state";
-import { Drawer } from "@kikos/ui/components/drawer";
-import { KanbanBoard } from "@/components/deals/kanban-board";
 import { DealDetail } from "@/components/deals/deal-detail";
+import { KanbanBoard } from "@/components/deals/kanban-board";
+import { PageHeader } from "@/components/layout/page-header";
 import { DEAL_STATUS_META, DEAL_STATUS_ORDER } from "@/lib/status";
 import { api } from "@/trpc/react";
 import type { DealDto, DealStatus } from "@kikos/shared";
+import { Button } from "@kikos/ui/components/button";
+import { EmptyState } from "@kikos/ui/components/empty-state";
+import { ErrorState } from "@kikos/ui/components/error-state";
+import { Input } from "@kikos/ui/components/input";
+import { Select } from "@kikos/ui/components/select";
+import { Skeleton } from "@kikos/ui/components/skeleton";
+import { Plus, Search, Target } from "lucide-react";
+import { useRouter } from "next/navigation";
+import * as React from "react";
 
 export default function DealsPage() {
   const router = useRouter();

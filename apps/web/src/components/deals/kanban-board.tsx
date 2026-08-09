@@ -1,6 +1,24 @@
 "use client";
 
 import * as React from "react";
+import {
+  DndContext,
+  DragOverlay,
+  PointerSensor,
+  closestCorners,
+  useDroppable,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+  type DragOverEvent,
+  type DragStartEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Plus } from "lucide-react";
 import type { DealDto, DealStatus, LeadDto, SellerDto } from "@kikos/shared";
 import { DealStatus as DealStatusEnum } from "@kikos/shared";
@@ -31,6 +49,42 @@ const COLUMN_ORDER: DealStatus[] = [
   DealStatusEnum.lost,
 ];
 
+function SortableDealCard({
+  deal,
+  lead,
+  seller,
+  onClick,
+}: {
+  deal: DealDto;
+  lead?: LeadDto;
+  seller?: SellerDto;
+  onClick: (deal: DealDto) => void;
+}) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: deal.id });
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      {...attributes}
+      {...listeners}
+      className={cn(
+        "cursor-grab active:cursor-grabbing",
+        isDragging && "opacity-30"
+      )}
+    >
+      <DealCard deal={deal} lead={lead} seller={seller} onClick={onClick} />
+    </div>
+  );
+}
+
 export function KanbanBoard({
   deals,
   leads,
@@ -47,11 +101,14 @@ export function KanbanBoard({
     setLocalDeals(deals);
   }, [deals]);
 
-  const [dragState, setDragState] = React.useState<{
-    deal: DealDto;
-    from: DealStatus;
-  } | null>(null);
+  const [activeDeal, setActiveDeal] = React.useState<DealDto | null>(null);
   const [overColumn, setOverColumn] = React.useState<DealStatus | null>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 6 },
+    })
+  );
 
   const changeStatusMutation = api.deals.changeStatus.useMutation({
     onError: (error) => {
@@ -65,22 +122,64 @@ export function KanbanBoard({
     },
     onSettled: () => {
       utils.deals.list.invalidate();
-      setDragState(null);
+      setActiveDeal(null);
       setOverColumn(null);
     },
   });
 
-  const handleDrop = (deal: DealDto, targetStatus: DealStatus) => {
-    if (deal.status === targetStatus) {
-      setDragState(null);
+  const handleDragStart = (event: DragStartEvent) => {
+    const deal = localDeals.find((d) => d.id === event.active.id);
+    if (deal) setActiveDeal(deal);
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const { over } = event;
+    if (!over) {
       setOverColumn(null);
+      return;
+    }
+    // Determine the column under the cursor
+    const id = over.id;
+    if (COLUMN_ORDER.includes(id as DealStatus)) {
+      setOverColumn(id as DealStatus);
+    } else {
+      const deal = localDeals.find((d) => d.id === id);
+      if (deal) setOverColumn(deal.status);
+    }
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setOverColumn(null);
+
+    if (!over) {
+      setActiveDeal(null);
+      return;
+    }
+
+    // Resolve target status
+    let targetStatus: DealStatus | null = null;
+    if (COLUMN_ORDER.includes(over.id as DealStatus)) {
+      targetStatus = over.id as DealStatus;
+    } else {
+      const targetDeal = localDeals.find((d) => d.id === over.id);
+      targetStatus = targetDeal?.status ?? null;
+    }
+
+    const deal = localDeals.find((d) => d.id === active.id);
+    if (!deal || !targetStatus) {
+      setActiveDeal(null);
+      return;
+    }
+
+    if (deal.status === targetStatus) {
+      setActiveDeal(null);
       return;
     }
 
     const allowed = ALLOWED_TRANSITIONS[deal.status];
     if (!allowed.includes(targetStatus)) {
-      setDragState(null);
-      setOverColumn(null);
+      setActiveDeal(null);
       toast({
         title: "Transição inválida",
         description: "O status atual do negócio não permite essa mudança.",
@@ -91,7 +190,7 @@ export function KanbanBoard({
 
     // Optimistic local update
     setLocalDeals((prev) =>
-      prev.map((d) => (d.id === deal.id ? { ...d, status: targetStatus } : d))
+      prev.map((d) => (d.id === deal.id ? { ...d, status: targetStatus! } : d))
     );
 
     changeStatusMutation.mutate({
@@ -106,93 +205,130 @@ export function KanbanBoard({
   }));
 
   return (
-    <div className="flex snap-x gap-4 overflow-x-auto pb-2">
-      {groups.map(({ status, deals: columnDeals }) => {
-        const meta = DEAL_STATUS_META[status];
-        const isOver = overColumn === status;
-        const canDropHere = dragState
-          ? ALLOWED_TRANSITIONS[dragState.deal.status].includes(status)
-          : false;
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCorners}
+      onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragEnd={handleDragEnd}
+      onDragCancel={() => {
+        setActiveDeal(null);
+        setOverColumn(null);
+      }}
+    >
+      <div className="flex snap-x gap-4 overflow-x-auto pb-2">
+        {groups.map(({ status, deals: columnDeals }) => {
+          const meta = DEAL_STATUS_META[status];
+          const isOver = overColumn === status;
+          const canDropHere = activeDeal
+            ? ALLOWED_TRANSITIONS[activeDeal.status].includes(status)
+            : false;
 
-        return (
-          <div
-            key={status}
-            onDragOver={(e) => {
-              e.preventDefault();
-              setOverColumn(status);
-            }}
-            onDragLeave={() => setOverColumn(null)}
-            onDrop={() => {
-              if (dragState && canDropHere) {
-                handleDrop(dragState.deal, status);
-              }
-            }}
-            className={cn(
-              "flex w-72 shrink-0 snap-start flex-col rounded-xl border border-border/60 bg-card/40",
-              isOver && canDropHere && "border-accent/60 bg-accent/10",
-              isOver && !canDropHere && "border-destructive/40 bg-destructive/5"
-            )}
-          >
-            {/* Column header */}
-            <div className="flex items-center justify-between border-b border-border/60 px-3 py-2.5">
-              <div className="flex items-center gap-2">
-                <span className={cn("size-2 rounded-full", meta.dot)} />
-                <span className="text-[13px] font-semibold text-foreground">
-                  {meta.label}
-                </span>
-                <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
-                  {columnDeals.length}
-                </span>
-              </div>
-              <button
-                type="button"
-                className="rounded p-0.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-                aria-label={`Adicionar negócio em ${meta.label}`}
+          return (
+            <DndColumn
+              key={status}
+              status={status}
+              label={meta.label}
+              dot={meta.dot}
+              count={columnDeals.length}
+              isOver={isOver}
+              canDropHere={canDropHere}
+            >
+              <SortableContext
+                items={columnDeals.map((d) => d.id)}
+                strategy={verticalListSortingStrategy}
               >
-                <Plus className="size-3.5" />
-              </button>
-            </div>
-
-            {/* Cards */}
-            <div className="flex flex-1 flex-col gap-2 p-2">
-              {columnDeals.map((deal) => {
-                const lead = leads.find((l) => l.id === deal.leadId);
-                const seller = sellers.find((s) => s.id === deal.sellerId);
-                return (
-                  <div
-                    key={deal.id}
-                    draggable
-                    onDragStart={(e) => {
-                      e.dataTransfer.effectAllowed = "move";
-                      e.dataTransfer.setData("text/plain", deal.id);
-                      setDragState({ deal, from: deal.status });
-                    }}
-                    onDragEnd={() => {
-                      setDragState(null);
-                      setOverColumn(null);
-                    }}
-                  >
-                    <DealCard
+                {columnDeals.map((deal) => {
+                  const lead = leads.find((l) => l.id === deal.leadId);
+                  const seller = sellers.find((s) => s.id === deal.sellerId);
+                  return (
+                    <SortableDealCard
+                      key={deal.id}
                       deal={deal}
                       lead={lead}
                       seller={seller}
                       onClick={onSelectDeal}
-                      dragging={dragState?.deal.id === deal.id}
-                      ghost={dragState?.deal.id === deal.id}
                     />
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </SortableContext>
 
               {columnDeals.length === 0 && (
                 <div className="flex min-h-[80px] flex-1 items-center justify-center rounded-lg border border-dashed border-border/50 text-[11px] text-muted-foreground">
                   Arraste para cá
                 </div>
               )}
-            </div>
+            </DndColumn>
+          );
+        })}
+      </div>
+
+      <DragOverlay>
+        {activeDeal ? (
+          <div className="rotate-2 opacity-90 shadow-lg ring-2 ring-accent/40">
+            <DealCard
+              deal={activeDeal}
+              lead={leads.find((l) => l.id === activeDeal.leadId)}
+              seller={sellers.find((s) => s.id === activeDeal.sellerId)}
+              onClick={() => {}}
+            />
           </div>
-        );
-      })}
+        ) : null}
+      </DragOverlay>
+    </DndContext>
+  );
+}
+
+function DndColumn({
+  status,
+  label,
+  dot,
+  count,
+  isOver,
+  canDropHere,
+  children,
+}: {
+  status: DealStatus;
+  label: string;
+  dot: string;
+  count: number;
+  isOver: boolean;
+  canDropHere: boolean;
+  children: React.ReactNode;
+}) {
+const { setNodeRef } = useDroppable({ id: status });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={cn(
+        "flex w-72 shrink-0 snap-start flex-col rounded-xl border border-border/60 bg-card/40",
+        isOver && canDropHere && "border-accent/60 bg-accent/10",
+        isOver && !canDropHere && "border-destructive/40 bg-destructive/5"
+      )}
+    >
+      {/* Column header */}
+      <div className="flex items-center justify-between border-b border-border/60 px-3 py-2.5">
+        <div className="flex items-center gap-2">
+          <span className={cn("size-2 rounded-full", dot)} />
+          <span className="text-[13px] font-semibold text-foreground">
+            {label}
+          </span>
+          <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+            {count}
+          </span>
+        </div>
+        <button
+          type="button"
+          className="rounded p-0.5 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+          aria-label={`Adicionar negócio em ${label}`}
+        >
+          <Plus className="size-3.5" />
+        </button>
+      </div>
+
+      {/* Cards */}
+      <div className="flex flex-1 flex-col gap-2 p-2">{children}</div>
     </div>
   );
 }

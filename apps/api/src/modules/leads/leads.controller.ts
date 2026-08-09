@@ -47,7 +47,7 @@ export class LeadsController {
   }
 
   @Post()
-  async create(@Body() data: CreateLeadDtoClass, @Session() session: UserSession) {
+  async create(@Body() data: CreateLeadDtoClass, @Session() session: UserSession) {    
     return this.leadsService.create(data, toAuthContext(session));
   }
 

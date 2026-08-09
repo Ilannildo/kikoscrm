@@ -11,35 +11,37 @@ import { env } from './env';
 import { ResponseInterceptor } from './infra/response/response.interceptor';
 import { CORS_ALLOWED_ORIGINS } from '@common/config/app';
 import { LoggerService } from '@infra/logger/logger.service';
+import { useContainer } from 'class-validator';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    bufferLogs: true,
-    bodyParser: false,
+    bufferLogs: true,    
   });
 
   app.useGlobalFilters(new HttpExceptionFilter());
 
   // DOMAIN
   app.set('trust proxy', true);
+
   app.enableCors({
     origin: CORS_ALLOWED_ORIGINS,
     credentials: true,
   });
+  useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
   // LOGGER
   const LoggerServiceInstance = app.get(LoggerService);
   app.useLogger(LoggerServiceInstance);
   app.useGlobalInterceptors(new LoggerErrorInterceptor());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-  app.useGlobalPipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-      stopAtFirstError: true,
-      transformOptions: { enableImplicitConversion: true },
-    }),
-  );
+  // app.useGlobalPipes(
+  //   new ValidationPipe({
+  //     transform: true,
+  //     whitelist: true,
+  //     stopAtFirstError: true,
+  //     transformOptions: { enableImplicitConversion: true },
+  //   }),
+  // );
   // RESPONSE
   app.useGlobalInterceptors(new ResponseInterceptor());
   app.enableShutdownHooks();

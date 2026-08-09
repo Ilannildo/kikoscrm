@@ -12,6 +12,9 @@ export class SellersService {
   constructor(private readonly prisma: PrismaService) {}
 
   async list(query: ListSellersQueryDto, auth: AuthContext) {
+
+    console.log('query',query)
+
     const { page, pageSize, search } = query;
 
     const where: Prisma.UserWhereInput = { role: UserRole.seller };

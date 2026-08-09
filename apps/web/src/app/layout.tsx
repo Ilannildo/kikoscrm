@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { headers } from "next/headers";
 import { cloakSSROnlySecret } from "ssr-only-secrets";
+import { ToastProvider } from "@kikos/ui/components/toast";
 import { TRPCReactProvider } from "@/trpc/react";
 
 export const metadata: Metadata = {
@@ -24,10 +25,10 @@ export default async function RootLayout({
   );
 
   return (
-<html lang="pt" suppressHydrationWarning className="scroll-smooth dark">
+    <html lang="pt" suppressHydrationWarning className="scroll-smooth dark">
       <body className="antialiased">
         <TRPCReactProvider ssrOnlySecret={encryptedCookie}>
-          {children}
+          <ToastProvider>{children}</ToastProvider>
         </TRPCReactProvider>
       </body>
     </html>

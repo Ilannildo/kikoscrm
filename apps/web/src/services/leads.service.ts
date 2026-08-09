@@ -1,11 +1,12 @@
 import type { CreateLeadDto, HttpResponse, LeadDto, ListLeadsQueryDto } from "@kikos/shared";
 import { axiosApi } from "./api";
 import type { PaginatedResult } from "./types";
+import { UpdateLeadRequestDto } from "@/common/schemas/update-lead-request.schema";
 
 export async function listLeads(
   params: ListLeadsQueryDto
 ): Promise<PaginatedResult<LeadDto>> {
-const response = await axiosApi.get<HttpResponse<PaginatedResult<LeadDto>>>(
+  const response = await axiosApi.get<HttpResponse<PaginatedResult<LeadDto>>>(
     "/leads",
     { params }
   );
@@ -23,11 +24,10 @@ export async function createLead(data: CreateLeadDto): Promise<LeadDto> {
 }
 
 export async function updateLead(
-  id: string,
-  data: Partial<CreateLeadDto>
+  { leadId, data }: UpdateLeadRequestDto
 ): Promise<LeadDto> {
   const response = await axiosApi.patch<HttpResponse<LeadDto>>(
-    `/leads/${id}`,
+    `/leads/${leadId}`,
     data
   );
   return response.data.data;

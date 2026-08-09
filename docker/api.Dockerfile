@@ -56,6 +56,10 @@ RUN pnpm turbo run build --filter=api...
 # RUNTIME
 # ============================================================
 
+# ============================================================
+# RUNTIME
+# ============================================================
+
 FROM node:24-alpine AS runner
 
 WORKDIR /app
@@ -67,17 +71,18 @@ RUN apk add --no-cache postgresql17-client
 RUN corepack enable \
     && corepack prepare pnpm@10.18.3 --activate
 
-
-# Production dependencies
+# Production dependencies / workspace structure
 COPY --from=installer /app/ ./
 
-# Código compilado
+# API
 COPY --from=builder /app/apps/api/dist ./apps/api/dist
+
+# Shared
+COPY --from=builder /app/packages/shared/dist ./packages/shared/dist
 
 # Prisma
 COPY --from=builder /app/apps/api/prisma ./apps/api/prisma
 COPY --from=builder /app/apps/api/prisma.config.ts ./apps/api/prisma.config.ts
-
 
 WORKDIR /app/apps/api
 

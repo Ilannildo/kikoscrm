@@ -83,9 +83,9 @@ jobs:
           push: true
 
           build-args: |
-            BETTER_AUTH_URL=https://api.kikos.teragestor.com.br
-            NEXT_PUBLIC_API_URL=https://api.kikos.teragestor.com.br
-            NEXT_PUBLIC_URL=https://app.kikos.teragestor.com.br
+            BETTER_AUTH_URL="https://api.kikos.teragestor.com.br"
+            NEXT_PUBLIC_API_URL="https://api.kikos.teragestor.com.br"
+            NEXT_PUBLIC_URL="https://app.kikos.teragestor.com.br"
 
           tags: |
             ${{ env.IMAGE_PREFIX }}/kikos-web:${{ steps.vars.outputs.tag }}

@@ -24,7 +24,7 @@ export default async function RootLayout({
   );
 
   return (
-    <html lang="pt" suppressHydrationWarning className="scroll-smooth">
+<html lang="pt" suppressHydrationWarning className="scroll-smooth dark">
       <body className="antialiased">
         <TRPCReactProvider ssrOnlySecret={encryptedCookie}>
           {children}

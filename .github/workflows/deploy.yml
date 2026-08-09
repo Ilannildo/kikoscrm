@@ -189,14 +189,14 @@ jobs:
           IMAGE_TAG: ${{ steps.vars.outputs.tag }}
         run: |
           kubectl set image \
-            deployment/kikos-crm-api \
+            deployment/kikos-api \
             kikos-api=${IMAGE_PREFIX}/kikos-api:${IMAGE_TAG} \
             -n "${NAMESPACE}"
 
       - name: Wait for API rollout
         run: |
           kubectl rollout status \
-            deployment/kikos-crm-api \
+            deployment/kikos-api \
             -n "${NAMESPACE}" \
             --timeout=250s
 

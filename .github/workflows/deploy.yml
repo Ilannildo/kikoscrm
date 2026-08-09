@@ -152,7 +152,7 @@ jobs:
 
           echo "🔹 Running Prisma migration"
 
-          kubectl delete job kikos-crm-prisma-migrate \
+          kubectl delete job kikos-prisma-migrate \
             -n "${NAMESPACE}" \
             --ignore-not-found
 
@@ -162,14 +162,14 @@ jobs:
 
           if ! kubectl wait \
             --for=condition=complete \
-            job/kikos-crm-prisma-migrate \
+            job/kikos-prisma-migrate \
             -n "${NAMESPACE}" \
             --timeout=240s; then
 
             echo "❌ Prisma migration failed"
 
             kubectl logs \
-              job/kikos-crm-prisma-migrate \
+              job/kikos-prisma-migrate \
               -n "${NAMESPACE}" \
               --all-containers=true \
               || true

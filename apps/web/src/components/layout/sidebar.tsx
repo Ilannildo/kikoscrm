@@ -13,6 +13,7 @@ import { api } from "@/trpc/react";
 import { authClient } from "@/lib/auth-client";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@kikos/ui/components/avatar"
+import { KikosLogo } from "@kikos/ui/components/kikos-logo";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -56,12 +57,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       >
         {/* Logo */}
         <div className="flex h-14 items-center gap-2 px-5">
-          <div className="flex size-7 items-center justify-center rounded-lg bg-accent text-accent-foreground">
-            <Target className="size-4" />
-          </div>
-          <span className="text-sm font-semibold tracking-tight text-foreground">
-            Kikos CRM
-          </span>
+          <KikosLogo size="lg" />
           <button
             className="ml-auto text-muted-foreground lg:hidden"
             onClick={onClose}

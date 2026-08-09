@@ -7,6 +7,7 @@ import { ISignUpRequest, SignUpRequestSchema } from "@kikos/shared";
 import { Button } from "@kikos/ui/components/button";
 import { Field, FieldError, FieldGroup, FieldLabel } from "@kikos/ui/components/field";
 import { Input } from "@kikos/ui/components/input";
+import { KikosLogo } from "@kikos/ui/components/kikos-logo";
 import { Target } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
@@ -50,18 +51,9 @@ export default function RegisterPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
-        <div className="mb-8 flex flex-col items-center gap-3">
-          <div className="flex size-11 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-            <Target className="size-6" />
-          </div>
-          <div className="text-center">
-            <h1 className="text-xl font-semibold tracking-tight text-foreground">
-              Criar conta
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Comece a usar o Kikos CRM
-            </p>
-          </div>
+        <div className="flex flex-col items-center mb-8">
+          <KikosLogo size="lg" />
+          <p className="text-sm text-[#71717a] mt-3">Crie sua conta e comece a usar o Kikos CRM</p>
         </div>
 
         <form className="space-y-4 rounded-xl border border-border/60 bg-card p-6 shadow-sm" id="register-in-form" onSubmit={form.handleSubmit(onSubmit)}>

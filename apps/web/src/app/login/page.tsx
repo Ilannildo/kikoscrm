@@ -1,5 +1,5 @@
 "use client";
-
+import { KikosLogo } from "@kikos/ui/components/kikos-logo";
 import { authClient } from "@/lib/auth-client";
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ISignInRequest, SignInRequestSchema } from "@kikos/shared";
@@ -47,19 +47,11 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="w-full max-w-sm">
-        <div className="mb-8 flex flex-col items-center gap-3">
-          <div className="flex size-11 items-center justify-center rounded-xl bg-accent text-accent-foreground">
-            <Target className="size-6" />
-          </div>
-          <div className="text-center">
-            <h1 className="text-xl font-semibold tracking-tight text-foreground">
-              Kikos CRM
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Entre para acessar seu painel comercial
-            </p>
-          </div>
+        <div className="flex flex-col items-center mb-8">
+          <KikosLogo size="lg" />
+          <p className="text-sm text-[#71717a] mt-3">Entre na sua conta corporativa para continuar</p>
         </div>
+
 
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 rounded-xl border border-border/60 bg-card p-6 shadow-sm">
           <FieldGroup className="grid-2 mt-10 mb-6 gap-6 md:grid-cols-2">

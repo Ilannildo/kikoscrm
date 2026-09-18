@@ -8,7 +8,7 @@ spec:
     - name: main-gateway
       namespace: default      
   hostnames:
-    - api.kikos.teragestor.com.br      
+    - api.kikos.teragestor.com      
   rules:
     - matches:
         - path:
